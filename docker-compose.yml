@@ -1,20 +1,19 @@
 services:
   db:
-    image: mariadb:10.11
+    image: postgres:16-alpine
     container_name: watchify-db
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: watchify
-      MYSQL_USER: watchify
-      MYSQL_PASSWORD: password
+      POSTGRES_DB: watchify
+      POSTGRES_USER: watchify
+      POSTGRES_PASSWORD: password
     ports:
-      - "3307:3306"
+      - "5433:5432"
     volumes:
-      - db_data:/var/lib/mysql
+      - db_data:/var/lib/postgresql/data
     networks:
       - watchify-network
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: ["CMD-SHELL", "pg_isready -U watchify -d watchify"]
       timeout: 20s
       retries: 10
 
@@ -25,7 +24,7 @@ services:
       - "8888:8888"
     environment:
       DB_HOST: db
-      DB_PORT: 3306
+      DB_PORT: 5432
       DB_NAME: watchify
       DB_USER: watchify
       DB_PASSWORD: password
